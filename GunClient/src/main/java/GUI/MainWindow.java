@@ -61,7 +61,7 @@ public class MainWindow extends JFrame implements KeyListener {
      * exit, save, refresh and shoot, and add keyListeners to all components. By
      * pressing exit button you switch app off. By pressing save button you save
      * your profile. By pressing refresh button you get new catridges, you have
-     * some. (attain gun) By pressing keys ASDW you can control the gun A(move
+     * some. (load gun) By pressing keys ASDW you can control the gun A(move
      * left), S(move down), W(move up), D(move right)
      *
      */
