@@ -22,7 +22,6 @@ import model.Message;
  */
 public class MainWindow extends JFrame implements KeyListener{
     private JButton exit, save, refresh, shoot;
-    private JLabel name, cartridges;
     private WindowManager windowManager;
     private JiraClient jiraClient;
     private Client client;

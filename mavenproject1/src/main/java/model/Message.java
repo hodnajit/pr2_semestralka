@@ -62,14 +62,6 @@ public class Message implements Serializable {
          */
         LEFT,
         /**
-         * horangle to move the gun somewhere horizontal
-         */
-        HORANGLE,
-        /**
-         * verangle to move the gun somewhere verizontal
-         */
-        VERANGLE,
-        /**
          * Shoot to shoot
          */
         SHOOT
