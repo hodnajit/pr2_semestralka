@@ -36,11 +36,11 @@ public class ConnectDialogue extends JFrame {
      */
     private WindowManager windowManager;
     /**
-     * IP adress of server, string for creating client
+     * IP address of server, string for creating client
      */
     private String ipS;
     /**
-     * Port, where rpi listen
+     * Port, where rpi listens
      *
      */
     private int portI;
@@ -84,13 +84,10 @@ public class ConnectDialogue extends JFrame {
                 ipS = ip.getText();
                 //portI = Integer.parseInt(port.getText());
                 //to tu pak nebude - test
-                ipS = "10.0.0.3";
+                //ipS = "10.0.0.3";
                 //portI = 1712;
-                Client c = new Client(ipS, portI);
-                Thread t = new Thread(c);
-                t.setDaemon(true);
-                t.start();
-                windowManager.connectedToClient(c);
+                windowManager.connectToClient(ipS, Integer.parseInt(port.getText()));
+                dispose();
             }
 
         });
