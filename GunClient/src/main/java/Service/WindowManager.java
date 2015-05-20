@@ -8,6 +8,7 @@ package Service;
 import GUI.ConnectDialogue;
 import GUI.LoginDialogue;
 import GUI.MainWindow;
+import GUI.ProgressBarLoading;
 import comm.Client;
 import comm.JiraClient;
 
@@ -33,22 +34,29 @@ public class WindowManager {
     public WindowManager() {
         ld = new LoginDialogue(this);
         ld.setVisible(true);
-        cd = new ConnectDialogue(this);
-        cd.setVisible(false);
-        mw = new MainWindow(this, jc, c);
-        mw.setVisible(false);
     }
 
     public void connectedToClient(Client client) {
         c = client;
         cd.dispose();
+        mw = new MainWindow(this, jc, c);
         mw.setVisible(true);
 
     }
 
     public void logginToJira(JiraClient jirC) {
         jc = jirC;
+        ld.setEnabled(false);
+        final ProgressBarLoading pbl = new ProgressBarLoading(jc);
+        System.out.println("created pbl");
+        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                System.out.println("run");
+                pbl.createAndShow(pbl);
+            }
+        });
         ld.dispose();
+        cd = new ConnectDialogue(this);
         cd.setVisible(true);
 
     }

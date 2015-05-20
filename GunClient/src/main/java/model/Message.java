@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Jituška Zub
+ * @author Jituška zub
  */
 public class Message implements Serializable {
     /**
@@ -61,6 +61,14 @@ public class Message implements Serializable {
          * left to move the gunt left
          */
         LEFT,
+        /**
+         * horangle to move the gun somewhere horizontal
+         */
+        HORANGLE,
+        /**
+         * verangle to move the gun somewhere verizontal
+         */
+        VERANGLE,
         /**
          * Shoot to shoot
          */

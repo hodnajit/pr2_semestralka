@@ -16,6 +16,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import model.Message;
 
 /**
@@ -40,35 +42,43 @@ public class Client implements Runnable{
     private ObjectOutputStream os;
     private ObjectInputStream is;
     private boolean startedUp = false;
-    private Queue<Message> queue = new LinkedList<Message>();
+    private Queue<Message> queue;
     /**
      * Construct of client
      */
     public Client(String host, int port){
         this.host = host;
         this.port = port;
-        System.out.println("Construct client.");
+        queue = new LinkedList<Message>();
+        //System.out.println("Construct client.");
     }
     /**
-     * Starts running of client. Make socket to listen the server, send ping every 2ms, and send other messages, after all close the socket
+     * Starts running of client. Make socket to listen the server, send ping every 2ms, and send other messages, that are added to queue
+     * , after all close the socket
      * @UnknownHostException if it cannot find server
      * @IOException if there is some I/O problem or socket close failed
      * @InterruptedException if 
      */
     @Override
     public void run(){
-        System.out.println("Run client.");
+        //System.out.println("Run client.");
         try {
             s = new Socket(host, port);
         } catch (UnknownHostException ex) {
             System.err.println("E: Nothing fucking found @ " + host + ":" + port);
+            JFrame frame = new JFrame();
+            JOptionPane.showMessageDialog(frame, "Unknown ip adress or port.", "UnknownHostException", JOptionPane.ERROR_MESSAGE);
+            
             System.exit(1);
         } catch (IOException ex) {
             System.err.println("E: Fucking I/O problem");
+            JFrame jframe = new JFrame();
+            JOptionPane.showMessageDialog(jframe, "IO Problem while connecting to server.", "IO problem", JOptionPane.ERROR_MESSAGE);  
+            ex.printStackTrace();
             System.exit(1);
         }
         try {
-            System.out.println("Ping.");
+            //System.out.println("Ping.");
             os = new ObjectOutputStream(s.getOutputStream());
             is = new ObjectInputStream(s.getInputStream());
             os.writeObject(new Message(Message.Type.HANDSHAKE, "Hey!"));
@@ -89,14 +99,22 @@ public class Client implements Runnable{
             this.startedUp = true;
             while(shouldRun){
                 try {
+                    while(!queue.isEmpty()){
+                        os.writeObject(queue.poll());
+                        os.flush();
+                    }
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+                    JFrame jframe = new JFrame();
+                    JOptionPane.showMessageDialog(jframe, "Sending request interrupted.", "Interrupted problem.", JOptionPane.ERROR_MESSAGE);    
                 }
                 
             }
         }catch(IOException ex){
             System.err.println("E: Something's fucked up. Deal with it.");
+            JFrame jframe = new JFrame();
+            JOptionPane.showMessageDialog(jframe, "IO Problem while sending your request.", "IO problem.", JOptionPane.ERROR_MESSAGE);         
             ex.printStackTrace();
         } finally{
             try {

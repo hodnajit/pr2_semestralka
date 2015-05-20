@@ -90,7 +90,8 @@ public class LoginDialogue extends JFrame {
                 try {
                     pass = "iddqdiddqd";
                     user = "FilipK";
-                    windowManager.logginToJira(new JiraClient(user, pass));
+                    JiraClient jc = new JiraClient(user, pass);
+                    windowManager.logginToJira(jc);                    
                 } catch (URISyntaxException ex) {
                     Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "URISyntax error with connecting to jira.", ex);
                 } catch (ClassNotFoundException ex) {
@@ -107,5 +108,4 @@ public class LoginDialogue extends JFrame {
         getContentPane().add(login);
         getContentPane().add(exit);
     }
-
 }

@@ -28,6 +28,7 @@ public class MainWindow extends JFrame implements KeyListener {
 
     private JButton exit, save, refresh, shoot;
     private WindowManager windowManager;
+    private JLabel cartridges;
     /**
      * User's jiraClient
      */
@@ -70,18 +71,21 @@ public class MainWindow extends JFrame implements KeyListener {
         save = new JButton("save");
         refresh = new JButton("refresh");
         shoot = new JButton("shoot");
+        cartridges = new JLabel(String.valueOf(this.jiraClient.getCartridges()));
 
         setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
+        getContentPane().add(cartridges);
         getContentPane().add(save);
         getContentPane().add(refresh);
         getContentPane().add(shoot);
         getContentPane().add(exit);
 
+        cartridges.addKeyListener(this);
         shoot.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                //shoot
+                client.sendMessage(new Message(Message.Command.SHOOT));
             }
 
         });
@@ -91,7 +95,7 @@ public class MainWindow extends JFrame implements KeyListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                jiraClient.safeQueue();
+                jiraClient.saveProfile();
             }
 
         });
@@ -126,17 +130,17 @@ public class MainWindow extends JFrame implements KeyListener {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_A) {
-            //client.sendMessage(new Message(Message.Command.LEFT));
-            System.out.println("left");
+            client.sendMessage(new Message(Message.Command.LEFT));
+            //System.out.println("left");
         } else if (key == KeyEvent.VK_D) {
-            //client.sendMessage(new Message(Message.Command.RIGHT));
-            System.out.println("right");
+            client.sendMessage(new Message(Message.Command.RIGHT));
+            //System.out.println("right");
         } else if (key == KeyEvent.VK_W) {
-            System.out.println("up");
-            //client.sendMessage(new Message(Message.Command.UP));
+            //System.out.println("up");
+            client.sendMessage(new Message(Message.Command.UP));
         } else if (key == KeyEvent.VK_S) {
-            System.out.println("down");
-            //client.sendMessage(new Message(Message.Command.DOWN));
+            //System.out.println("down");
+            client.sendMessage(new Message(Message.Command.DOWN));
         }
     }
 

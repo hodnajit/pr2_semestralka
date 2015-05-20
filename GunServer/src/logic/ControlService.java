@@ -34,25 +34,43 @@ public class ControlService {
     final GpioPinDigitalOutput pinTrigger;
     private Timer timer;
     /**
-     * Maximum angle how servo can be
+     * Maximum vertical angle how servo can be
      */
-    private int maxAngle = 400;
+    private int maxAngleVer = 1000;
     /**
-     * Minimum angle that servo can be
+     * Minimum vertical angle that servo can be
      */
-    private int minAngle = -400;
+    private int minAngleVer = -500;
+    /**
+     * Maximum vertical angle how servo can be
+     */
+    private int maxAngleHor = 1000;
+    /**
+     * Minimum vertical angle that servo can be
+     */
+    private int minAngleHor = -1500;
     /**
      * Angle to turn in command case UP, DOWN, LEFT, RIGHT, it inicialized on twentieth from range of servo
      */
-    private int stepAngle = (maxAngle-minAngle)/20;
+    private int stepAngleVer = 200;
+    private int stepAngleHor = 200;
     /**
-     * Actual horizontal position of servo, inicialized on default position = 0;
+     * Actual horizontal position of servo, inicialized on default position = -350;
      */
-    private int horPosition=0;
+    private int horPosition = -350;
     /**
-     * Actual vertical position of servo, inicialized on default position = 0;
+     * Actual vertical position of servo, inicialized on default position = 400;
      */
-    private int verPosition=0;
+    private int verPosition = 400;
+    /**
+     * Default Vertical angle for servos, inicialized 400
+     */
+    private int defaultVer = 400;
+    /**
+     * Default horizontal angle for servos, inicialized -350
+     */
+    private int defaultHor = -350;
+    private int fast = 20;
     /**
      * Construct control service, set pinDrive and pinTrigger
      */
@@ -70,83 +88,66 @@ public class ControlService {
      * @param cmdValue value of that command
      */
     public void executeCommand(Message.Command command, int cmdValue) {
-        int angle;
         switch (command) {
-            case HORANGLE:                
-                horPosition=cmdValue;
-                if (horPosition>maxAngle){
-                    horPosition=maxAngle;
-                    serial.write("s0 "+horPosition+" 0\n");
-                }else if(horPosition<minAngle){
-                    horPosition=minAngle;
-                    serial.write("s0 "+horPosition+" 0\n");
-                }else{
-                    serial.write("s0 "+horPosition+" 0\n");
-                }
-                break;
-            case VERANGLE:
-                verPosition=cmdValue;
-                if (verPosition>maxAngle){
-                    verPosition=maxAngle;
-                    serial.write("s1 "+verPosition+" 0\n");
-                }else if(verPosition<minAngle){
-                    verPosition=minAngle;
-                    serial.write("s1 "+verPosition+" 0\n");
-                }else{
-                    serial.write("s1 "+verPosition+" 0\n");
-                }
-                break;
+//            case HORANGLE:                
+//                horPosition=cmdValue;
+//                if (horPosition>maxAngle){
+//                    horPosition=maxAngle;
+//                    serial.write("s0 "+horPosition+" 0\n");
+//                }else if(horPosition<minAngle){
+//                    horPosition=minAngle;
+//                    serial.write("s0 "+horPosition+" 0\n");
+//                }else{
+//                    serial.write("s0 "+horPosition+" 0\n");
+//                }
+//                break;
+//            case VERANGLE:
+//                verPosition=cmdValue;
+//                if (verPosition>maxAngle){
+//                    verPosition=maxAngle;
+//                    serial.write("s1 "+verPosition+" 0\n");
+//                }else if(verPosition<minAngle){
+//                    verPosition=minAngle;
+//                    serial.write("s1 "+verPosition+" 0\n");
+//                }else{
+//                    serial.write("s1 "+verPosition+" 0\n");
+//                }
+//                break;
             case UP:
-                angle=stepAngle;
-                verPosition+=stepAngle;
-                if (verPosition>maxAngle){
-                    verPosition=maxAngle;
-                    serial.write("s1 "+horPosition+" 0\n");
-                }else if(verPosition<minAngle){
-                    verPosition=minAngle;
-                    serial.write("s1 "+horPosition+" 0\n");
-                }else{                    
-                    serial.write("s1 "+horPosition+" 0\n");
+                verPosition+=stepAngleVer;
+                if (verPosition>maxAngleVer){
+                    verPosition=maxAngleVer;
+                }else if(verPosition<minAngleVer){
+                    verPosition=minAngleVer;
                 }
+                serial.write("s0 "+verPosition+" "+fast+"\n");
                 break;
             case DOWN:
-                angle=-stepAngle;
-                verPosition+=angle;
-                if (verPosition>maxAngle){
-                    verPosition=maxAngle;
-                    serial.write("s1 "+horPosition+" 0\n");
-                }else if(verPosition<minAngle){
-                    verPosition=minAngle;
-                    serial.write("s1 "+horPosition+" 0\n");
-                }else{                    
-                    serial.write("s1 "+horPosition+" 0\n");
+                verPosition-=stepAngleVer;
+                if (verPosition>maxAngleVer){
+                    verPosition=maxAngleVer;
+                }else if(verPosition<minAngleVer){
+                    verPosition=minAngleVer;
                 }
+                serial.write("s0 "+verPosition+" "+fast+"\n");
                 break;
             case RIGHT:
-                angle=stepAngle;
-                horPosition+=angle;
-                if (horPosition>maxAngle){
-                    horPosition=maxAngle;
-                    serial.write("s0 "+horPosition+" 0\n");
-                }else if(horPosition<minAngle){
-                    horPosition=minAngle;
-                    serial.write("s0 "+horPosition+" 0\n");
-                }else{                    
-                    serial.write("s0 "+horPosition+" 0\n");
+                horPosition-=stepAngleHor;
+                if (horPosition>maxAngleHor){
+                    horPosition=maxAngleHor;
+                }else if(horPosition<minAngleHor){
+                    horPosition=minAngleHor;
                 }
+                serial.write("s1 "+horPosition+" "+fast+"\n");
                 break;
             case LEFT:
-                angle=-stepAngle;
-                horPosition+=angle;
-                if (horPosition>maxAngle){
-                    horPosition=maxAngle;
-                    serial.write("s0 "+horPosition+" 0\n");
-                }else if(horPosition<minAngle){
-                    horPosition=minAngle;
-                    serial.write("s0 "+horPosition+" 0\n");
-                }else{                    
-                    serial.write("s0 "+horPosition+" 0\n");
+                horPosition+=stepAngleHor;
+                if (horPosition>maxAngleHor){
+                    horPosition=maxAngleHor;
+                }else if(horPosition<minAngleHor){
+                    horPosition=minAngleHor;
                 }
+                serial.write("s1 "+horPosition+" "+fast+"\n");
                 break;
             case SHOOT:
                 pinDrive.low();
@@ -160,9 +161,9 @@ public class ControlService {
                                 pinTrigger.high();
                                 pinDrive.high();
                             }
-                        }, 500);
+                        }, 100);
                     }
-                }, 3000);
+                }, 1000);
                 break;
             default:
             
@@ -173,7 +174,7 @@ public class ControlService {
      * It reset position of each servos
      */
     public void resetPosition() {
-        serial.write("sa\n");
+        serial.write("sa "+defaultVer+" "+defaultVer+"\n");
     }
     
 }

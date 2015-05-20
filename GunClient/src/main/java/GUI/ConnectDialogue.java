@@ -85,7 +85,7 @@ public class ConnectDialogue extends JFrame {
                 //portI = Integer.parseInt(port.getText());
                 //to tu pak nebude - test
                 ipS = "10.0.0.3";
-                portI = 1712;
+                //portI = 1712;
                 Client c = new Client(ipS, portI);
                 Thread t = new Thread(c);
                 t.setDaemon(true);
