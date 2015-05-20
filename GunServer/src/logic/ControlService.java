@@ -36,41 +36,41 @@ public class ControlService {
     /**
      * Maximum vertical angle how servo can be
      */
-    private int maxAngleVer = 1000;
+    private final int maxAngleVer = 1000;
     /**
      * Minimum vertical angle that servo can be
      */
-    private int minAngleVer = -500;
+    private final int minAngleVer = -500;
     /**
      * Maximum vertical angle how servo can be
      */
-    private int maxAngleHor = 1000;
+    private final int maxAngleHor = 1000;
     /**
      * Minimum vertical angle that servo can be
      */
-    private int minAngleHor = -1500;
+    private final int minAngleHor = -1500;
     /**
-     * Angle to turn in command case UP, DOWN, LEFT, RIGHT, it inicialized on twentieth from range of servo
+     * Angle to turn in command case UP, DOWN, LEFT, RIGHT, initialized on default 200 angle (good angle to move servos anywhere)
      */
     private int stepAngleVer = 200;
     private int stepAngleHor = 200;
     /**
-     * Actual horizontal position of servo, inicialized on default position = -350;
+     * Actual horizontal position of servo, initialized on default position = -350;
      */
     private int horPosition = -350;
     /**
-     * Actual vertical position of servo, inicialized on default position = 400;
+     * Actual vertical position of servo, initialized on default position = 400;
      */
     private int verPosition = 400;
     /**
-     * Default Vertical angle for servos, inicialized 400
+     * Default Vertical angle for servos, initialized 400
      */
-    private int defaultVer = 400;
+    private final int defaultVer = 400;
     /**
-     * Default horizontal angle for servos, inicialized -350
+     * Default horizontal angle for servos, initialized -350
      */
-    private int defaultHor = -350;
-    private int fast = 20;
+    private final int defaultHor = -350;
+    private int fast = 20; //?
     /**
      * Construct control service, set pinDrive and pinTrigger
      */
@@ -82,72 +82,82 @@ public class ControlService {
         serial.open(Serial.DEFAULT_COM_PORT, 9600);
         timer = new Timer();
     }
+    
+    private enum Angle{
+        HORIZONTAL,
+        VERTICAL
+    }
+    
+    //helper method to saturate angle
+    private void alterAngleSaturated(int delta, Angle angle){
+        if(angle == Angle.HORIZONTAL){
+            horPosition += delta;
+            if (horPosition > maxAngleHor){
+                horPosition = maxAngleHor;
+            }else if(horPosition < minAngleHor){
+                horPosition = minAngleHor;
+            }
+        }else{
+            verPosition += delta;
+            if (verPosition > maxAngleVer){
+                verPosition = maxAngleVer;
+            }else if(verPosition < minAngleVer){
+                verPosition = minAngleVer;
+            }
+        }
+    }
+    
     /**
-     * Execute command which client write, it can turn horangle and verangle on angle, which client enter, or turn default on stepAngle left, right, up and down
-     * @param command the desired command from client
-     * @param cmdValue value of that command
+     * Execute command enclosed in message
+     * @param command command type to execute
+     * @param cmdValue command value
      */
     public void executeCommand(Message.Command command, int cmdValue) {
         switch (command) {
-//            case HORANGLE:                
-//                horPosition=cmdValue;
-//                if (horPosition>maxAngle){
-//                    horPosition=maxAngle;
-//                    serial.write("s0 "+horPosition+" 0\n");
-//                }else if(horPosition<minAngle){
-//                    horPosition=minAngle;
-//                    serial.write("s0 "+horPosition+" 0\n");
-//                }else{
-//                    serial.write("s0 "+horPosition+" 0\n");
-//                }
-//                break;
-//            case VERANGLE:
-//                verPosition=cmdValue;
-//                if (verPosition>maxAngle){
-//                    verPosition=maxAngle;
-//                    serial.write("s1 "+verPosition+" 0\n");
-//                }else if(verPosition<minAngle){
-//                    verPosition=minAngle;
-//                    serial.write("s1 "+verPosition+" 0\n");
-//                }else{
-//                    serial.write("s1 "+verPosition+" 0\n");
-//                }
-//                break;
-            case UP:
-                verPosition+=stepAngleVer;
-                if (verPosition>maxAngleVer){
-                    verPosition=maxAngleVer;
-                }else if(verPosition<minAngleVer){
-                    verPosition=minAngleVer;
+            /*
+            case HORANGLE:                
+                horPosition=cmdValue;
+                if (horPosition>maxAngle){
+                    horPosition=maxAngle;
+                    serial.write("s0 "+horPosition+" 0\n");
+                }else if(horPosition<minAngle){
+                    horPosition=minAngle;
+                    serial.write("s0 "+horPosition+" 0\n");
+                }else{
+                    serial.write("s0 "+horPosition+" 0\n");
                 }
+                break;
+            case VERANGLE:
+                verPosition=cmdValue;
+                if (verPosition>maxAngle){
+                    verPosition=maxAngle;
+                    serial.write("s1 "+verPosition+" 0\n");
+                }else if(verPosition<minAngle){
+                    verPosition=minAngle;
+                    serial.write("s1 "+verPosition+" 0\n");
+                }else{
+                    serial.write("s1 "+verPosition+" 0\n");
+                }
+                break;
+            */
+            case UP:
+                this.alterAngleSaturated(stepAngleVer, Angle.VERTICAL);
                 serial.write("s0 "+verPosition+" "+fast+"\n");
+                serial.flush();
                 break;
             case DOWN:
-                verPosition-=stepAngleVer;
-                if (verPosition>maxAngleVer){
-                    verPosition=maxAngleVer;
-                }else if(verPosition<minAngleVer){
-                    verPosition=minAngleVer;
-                }
+                this.alterAngleSaturated(-stepAngleVer, Angle.VERTICAL);
                 serial.write("s0 "+verPosition+" "+fast+"\n");
+                serial.flush();
                 break;
             case RIGHT:
-                horPosition-=stepAngleHor;
-                if (horPosition>maxAngleHor){
-                    horPosition=maxAngleHor;
-                }else if(horPosition<minAngleHor){
-                    horPosition=minAngleHor;
-                }
+                this.alterAngleSaturated(stepAngleHor, Angle.HORIZONTAL);
                 serial.write("s1 "+horPosition+" "+fast+"\n");
                 break;
             case LEFT:
-                horPosition+=stepAngleHor;
-                if (horPosition>maxAngleHor){
-                    horPosition=maxAngleHor;
-                }else if(horPosition<minAngleHor){
-                    horPosition=minAngleHor;
-                }
+                this.alterAngleSaturated(-stepAngleHor, Angle.HORIZONTAL);
                 serial.write("s1 "+horPosition+" "+fast+"\n");
+                serial.flush();
                 break;
             case SHOOT:
                 pinDrive.low();
