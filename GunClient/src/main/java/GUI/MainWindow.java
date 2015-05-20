@@ -8,11 +8,17 @@ package GUI;
 import Service.WindowManager;
 import comm.Client;
 import comm.JiraClient;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import model.Message;
 
@@ -29,6 +35,8 @@ public class MainWindow extends JFrame implements KeyListener {
     private JButton exit, save, refresh, shoot;
     private WindowManager windowManager;
     private JLabel cartridges;
+    private JProgressBar progressBar;
+    private Task task;
     /**
      * User's jiraClient
      */
@@ -72,6 +80,7 @@ public class MainWindow extends JFrame implements KeyListener {
         refresh = new JButton("refresh");
         shoot = new JButton("shoot");
         cartridges = new JLabel(String.valueOf(this.jiraClient.getCartridges()));
+        progressBar = new JProgressBar(0, 100);
 
         setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
         getContentPane().add(cartridges);
@@ -80,15 +89,14 @@ public class MainWindow extends JFrame implements KeyListener {
         getContentPane().add(shoot);
         getContentPane().add(exit);
 
+        progressBar.setIndeterminate(true);
+        progressBar.addKeyListener(this);
+        progressBar.setString("Loading new done tasks.");
+        progressBar.setStringPainted(true);
+
         cartridges.addKeyListener(this);
-        shoot.addActionListener(new ActionListener() {
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                client.sendMessage(new Message(Message.Command.SHOOT));
-            }
-
-        });
+        shoot.addActionListener(new acLisShoot(this));
         shoot.addKeyListener(this);
 
         save.addActionListener(new ActionListener() {
@@ -113,7 +121,7 @@ public class MainWindow extends JFrame implements KeyListener {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                jiraClient.updateIssueQueue();
+                startTask();
             }
 
         });
@@ -141,11 +149,97 @@ public class MainWindow extends JFrame implements KeyListener {
         } else if (key == KeyEvent.VK_S) {
             //System.out.println("down");
             client.sendMessage(new Message(Message.Command.DOWN));
+        } else if (key == KeyEvent.VK_SPACE) {
+            if ("0".equals(cartridges.getText())) {
+                JOptionPane.showMessageDialog(this, "You don't have any bullets left.", "Not enought bullets", JOptionPane.WARNING_MESSAGE);
+            } else {
+                client.sendMessage(new Message(Message.Command.SHOOT));
+                jiraClient.shoot();
+                cartridges.setText(Integer.toString(jiraClient.getCartridges()));
+            }
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         //nothing to do
+    }
+
+    class Task extends SwingWorker<Void, Void> {
+
+        private MainWindow mW;
+
+        public Task(MainWindow mW) {
+            this.mW = mW;
+        }
+        /*
+         * Main task. Executed in background thread.
+         */
+
+        @Override
+        public Void doInBackground() {
+            jiraClient.updateIssueQueue();
+            return null;
+        }
+
+        /*
+         * Executed in event dispatching thread
+         */
+        @Override
+        public void done() {
+            Toolkit.getDefaultToolkit().beep();
+            refresh.setEnabled(true);
+            getContentPane().remove(progressBar);
+            cartridges.setText(Integer.toString(mW.jiraClient.getCartridges()));
+            mW.repaint();
+            mW.pack();
+        }
+    }
+
+    class acLisShoot implements ActionListener {
+
+        JFrame mW;
+
+        public acLisShoot(JFrame mW) {
+            this.mW = mW;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if ("0".equals(cartridges.getText())) {
+                JOptionPane.showMessageDialog(mW, "You don't have any bullets left.","Not enough bullets.",JOptionPane.WARNING_MESSAGE);
+            } else {
+                client.sendMessage(new Message(Message.Command.SHOOT));
+                jiraClient.shoot();
+                cartridges.setText(Integer.toString(jiraClient.getCartridges()));
+            }
+        }
+
+    }/*
+    private JPanel getPanel() {
+        JPanel panel = new JPanel();
+        JLabel label = new JLabel("Fuck everything!");
+        ImageIcon image = null;
+        try {
+            image = new ImageIcon(ImageIO.read(getClass().getClassLoader().getResource("fuck.gif")));
+        } catch (MalformedURLException mue) {
+            mue.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+        label.setIcon(image);
+        panel.add(label);
+
+        return panel;
+    }*/
+
+    private void startTask() {
+        getContentPane().add(progressBar);
+        refresh.setEnabled(false);
+        this.repaint();
+        this.pack();
+        task = new Task(this);
+        task.execute();
     }
 }
