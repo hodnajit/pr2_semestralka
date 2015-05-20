@@ -18,7 +18,6 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.concurrent.Executors;
 import org.codehaus.jettison.json.JSONException;
 
 /**
@@ -148,7 +147,12 @@ public class LoginDialogue extends JFrame implements KeyListener{
                 /*pass = "iddqdiddqd"; //I should not push this to repo, but I did...
                 user = "FilipK";*/
                 try {
-                    windowManager.loginToJira(new JiraClient(user, pass));
+                    JiraClient jC = new JiraClient(user, pass);
+                    if(!jC.didAnythingReturn()){
+                        JOptionPane.showMessageDialog(null, "Wrong username or password, try again.", "Wrong authentification.", JOptionPane.WARNING_MESSAGE);
+                    }else{
+                        windowManager.loginToJira(jC);
+                    }                    
                 } catch (URISyntaxException ex) {
                     Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "URISyntax error with connecting to jira.", ex);
                 } catch (ClassNotFoundException ex) {

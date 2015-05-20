@@ -19,9 +19,11 @@ import org.joda.time.DateTimeZone;
 import com.atlassian.jira.rest.client.JiraRestClient;
 import com.atlassian.jira.rest.client.domain.Issue;
 import com.atlassian.jira.rest.client.*;
+import com.atlassian.jira.rest.client.domain.Authentication;
 import com.atlassian.jira.rest.client.domain.BasicIssue;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.rest.client.domain.SearchResult;
+import com.atlassian.jira.rest.client.domain.ServerInfo;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.atlassian.util.concurrent.Promise;
 import java.util.logging.Level;
@@ -56,7 +58,7 @@ public class JiraClient {
      * server.
      */
     private static DateTime dateOfLastUpdatedDoneIssue = new DateTime(2015, 1, 1, 1, 1, 1, 1, DateTimeZone.UTC);
-    
+
     /**
      * Key of last updated issue. (Chech dateOfLastUpdatedDoneIssue for more
      * information)
@@ -85,10 +87,13 @@ public class JiraClient {
      * queue of done issues, here we save the JSON query
      */
     private List<String> issueQueue;
+
     /**
      * Number of cartridges for shooting, it is inicialized on zero
      */
     private int cartridges = 0;
+    
+    Authentication authentication;
 
     /**
      * Constructor for create JiraClient, it sets username and password of user,
@@ -141,15 +146,17 @@ public class JiraClient {
      * This method create issueQueue from done issues(their keys) ordered by
      * update date
      */
-    private void doQueueOfDoneIssues() {
+    public void doQueueOfDoneIssues() {
         System.out.println("Fuck that!");
         issueQueue = new ArrayList<String>();
         //System.out.println("Jdu vypsat tasky:");
         for (BasicProject project : restClient.getProjectClient().getAllProjects().claim()) {
+            System.out.println("and that");
             String key = project.getKey();
             //System.out.println("Project: " + key);
             Promise<SearchResult> searchJqlPromise = restClient.getSearchClient().searchJql("(project = '" + key + "' AND status = " + statusOfIssues + " AND assignee = " + jiraUsername + ") ORDER BY updated");
             for (BasicIssue BIssue : searchJqlPromise.claim().getIssues()) {
+                System.out.println("everything!");
                 String isKey = BIssue.getKey();
                 //System.out.println("Issue: " + isKey);
                 Promise<Issue> issue = restClient.getIssueClient().getIssue(isKey);
@@ -157,8 +164,6 @@ public class JiraClient {
                 issueQueue.add(BIssue.getKey());
             }
         }
-        cartridges = sumProjectile();
-        issueQueue.clear();
 
     }
 
@@ -210,6 +215,8 @@ public class JiraClient {
      */
     public void updateIssueQueue() {
         doQueueOfDoneIssues();
+        cartridges = sumProjectile();
+        issueQueue.clear();
     }
 
     /**
@@ -221,11 +228,38 @@ public class JiraClient {
         return this.issueQueue.size();
     }
     
+    public boolean didAnythingReturn(){
+        try{
+            //BasicProject bc = restClient.getProjectClient().getProject("TPR").claim();
+            System.out.println("true");
+            return true;
+        }catch(RestClientException rCE){
+            System.out.println("Serou na mě.");
+            return false;
+        }
+    }
+    
+
     /**
      * Getter to get number of cartridges
+     *
      * @return number of actual cartridges
      */
     public int getCartridges() {
         return cartridges;
+    }
+    /**
+     * Getter to get queue of tasks, almost NULL
+     *
+     * @return queue with done tasks
+     */
+    public List<String> getIssueQueue() {
+        return issueQueue;
+    }
+    /**
+     * Clear queue;
+     */
+    public void clearQueue(){
+        issueQueue.clear();
     }
 }
