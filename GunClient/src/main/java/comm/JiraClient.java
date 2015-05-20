@@ -110,10 +110,6 @@ public class JiraClient {
         jiraServerUri = new URI(url);
         restClient = factory.createWithBasicHttpAuthentication(jiraServerUri, jiraUsername, jiraPassword);
         pm = new NullProgressMonitor();
-        //loadQueue();
-        /*doQueueOfDoneIssues();
-        cartridges = sumProjectile();
-        issueQueue.clear();*/
     }
 
     /**
