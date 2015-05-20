@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.*;
 import comm.JiraClient;
+import java.util.concurrent.Executors;
 import org.codehaus.jettison.json.JSONException;
 
 /**
@@ -37,6 +38,7 @@ public class LoginDialogue extends JFrame {
      * Buttons login and exit
      */
     private JButton login, exit;
+    private JProgressBar progressBar;
     /**
      * Window manager to manage all windows in app
      */
@@ -69,6 +71,9 @@ public class LoginDialogue extends JFrame {
         username = new JTextField("username");
         login = new JButton("log in");
         exit = new JButton("exit");
+        progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
         exit.addActionListener(new ActionListener() {
 
             @Override
@@ -87,11 +92,10 @@ public class LoginDialogue extends JFrame {
                     pass += tmp[i];
                 }
                 user = username.getText();
+                pass = "iddqdiddqd"; //I should not push this to repo, but I did...
+                user = "FilipK";
                 try {
-                    pass = "iddqdiddqd";
-                    user = "FilipK";
-                    JiraClient jc = new JiraClient(user, pass);
-                    windowManager.logginToJira(jc);                    
+                    windowManager.loginToJira(new JiraClient(user, pass));
                 } catch (URISyntaxException ex) {
                     Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "URISyntax error with connecting to jira.", ex);
                 } catch (ClassNotFoundException ex) {
@@ -100,12 +104,11 @@ public class LoginDialogue extends JFrame {
                     Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "Bad identification.", ex);
                 }
             }
-
         });
-        setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
         getContentPane().add(username);
         getContentPane().add(password);
         getContentPane().add(login);
         getContentPane().add(exit);
     }
+
 }
