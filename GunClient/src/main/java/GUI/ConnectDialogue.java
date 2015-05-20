@@ -6,11 +6,14 @@
 package GUI;
 
 import Service.WindowManager;
-import comm.Client;
 import java.awt.FlowLayout;
 import java.awt.HeadlessException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.*;
 
 /**
@@ -21,7 +24,7 @@ import javax.swing.*;
  *
  * @author Jituška zub
  */
-public class ConnectDialogue extends JFrame {
+public class ConnectDialogue extends JFrame implements KeyListener{
 
     /**
      * Buttons exit and connect
@@ -38,13 +41,8 @@ public class ConnectDialogue extends JFrame {
     /**
      * IP address of server, string for creating client
      */
-    private String ipS;
-    /**
-     * Port, where rpi listens
-     *
-     */
-    private int portI;
-
+    private boolean ipClicked = false;
+    private boolean portClicked = false;
     /**
      * Constructor of ConnectDialogue window, needs windowManager to manage
      * window, it call method initComponents() to init components in frame
@@ -55,7 +53,7 @@ public class ConnectDialogue extends JFrame {
     public ConnectDialogue(WindowManager w) throws HeadlessException {
         this.windowManager = w;
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Connecting to server.");
+        setTitle("GunClient - connecting to server");
         initComponents();
         pack();
     }
@@ -67,8 +65,50 @@ public class ConnectDialogue extends JFrame {
     private void initComponents() {
         ip = new JTextField("IP adress", 20);
         connect = new JButton("connect");
-        port = new JTextField("Port", 10);
+        port = new JTextField("Port",5);        
         exit = new JButton("exit");
+        
+        ip.addKeyListener(this);
+        ip.addFocusListener(new FocusListener(){
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                if(!ipClicked){
+                    ip.setText("");
+                    ipClicked = true;
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+               if("".equals(ip.getText())){
+                   ip.setText("IP adress");
+                   ipClicked = false;
+               }
+            }
+            
+        });
+        port.addKeyListener(this);
+        port.addFocusListener(new FocusListener(){
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                if(!portClicked){
+                    port.setText("");
+                    portClicked = true;
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if("".equals(port.getText())){
+                   port.setText("Port");
+                   portClicked = false;
+               }
+            }
+            
+        });
+        exit.addKeyListener(this);
         exit.addActionListener(new ActionListener() {
 
             @Override
@@ -77,16 +117,12 @@ public class ConnectDialogue extends JFrame {
             }
 
         });
+        connect.addKeyListener(this);
         connect.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                ipS = ip.getText();
-                //portI = Integer.parseInt(port.getText());
-                //to tu pak nebude - test
-                //ipS = "10.0.0.3";
-                //portI = 1712;
-                windowManager.connectToClient(ipS, Integer.parseInt(port.getText()));
+                windowManager.connectToClient(ip.getText(), Integer.parseInt(port.getText()));
                 dispose();
             }
 
@@ -97,5 +133,26 @@ public class ConnectDialogue extends JFrame {
         getContentPane().add(connect);
         getContentPane().add(exit);
 
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        //do nothing
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_ESCAPE) {
+            System.exit(0);
+        }else if(key == KeyEvent.VK_ENTER){
+            windowManager.connectToClient(ip.getText(), Integer.parseInt(port.getText()));
+            dispose();
+        }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        //do nothing
     }
 }

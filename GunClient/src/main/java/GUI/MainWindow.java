@@ -8,17 +8,12 @@ package GUI;
 import Service.WindowManager;
 import comm.Client;
 import comm.JiraClient;
-import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import model.Message;
 
@@ -60,7 +55,7 @@ public class MainWindow extends JFrame implements KeyListener {
         this.jiraClient = jc;
         this.client = c;
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Login");
+        setTitle("GunClient - Main");
         initComponents();
         pack();
     }
