@@ -5,6 +5,7 @@
  */
 package comm;
 
+import Service.WindowManager;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -43,12 +44,15 @@ public class Client implements Runnable{
     private ObjectInputStream is;
     private boolean startedUp = false;
     private Queue<Message> queue;
+    private WindowManager windowManager;
     /**
-     * Construct of client
+     * Constructor of the client service
      */
-    public Client(String host, int port){
+    public Client(String host, int port, WindowManager wM){
         this.host = host;
         this.port = port;
+        this.windowManager = wM;
+        
         queue = new LinkedList<Message>();
         //System.out.println("Construct client.");
     }
@@ -68,14 +72,13 @@ public class Client implements Runnable{
             System.err.println("E: Nothing fucking found @ " + host + ":" + port);
             JFrame frame = new JFrame();
             JOptionPane.showMessageDialog(frame, "Unknown ip adress or port.", "UnknownHostException", JOptionPane.ERROR_MESSAGE);
-            
-            System.exit(1);
+            this.windowManager.showConnectWindow();
         } catch (IOException ex) {
             System.err.println("E: Fucking I/O problem");
             JFrame jframe = new JFrame();
             JOptionPane.showMessageDialog(jframe, "IO Problem while connecting to server.", "IO problem", JOptionPane.ERROR_MESSAGE);  
             ex.printStackTrace();
-            System.exit(1);
+            this.windowManager.showConnectWindow();
         }
         try {
             //System.out.println("Ping.");
@@ -92,6 +95,9 @@ public class Client implements Runnable{
                         os.flush();
                     } catch (IOException ex) {
                         ex.printStackTrace();
+                        windowManager.showConnectWindow();
+                        pingTimer.cancel();
+                        pingTimer.purge();
                     }
                 }
                 
@@ -108,6 +114,9 @@ public class Client implements Runnable{
                     Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
                     JFrame jframe = new JFrame();
                     JOptionPane.showMessageDialog(jframe, "Sending request interrupted.", "Interrupted problem.", JOptionPane.ERROR_MESSAGE);    
+                    this.windowManager.showConnectWindow();
+                    pingTimer.cancel();
+                    pingTimer.purge();
                 }
                 
             }
@@ -116,6 +125,9 @@ public class Client implements Runnable{
             JFrame jframe = new JFrame();
             JOptionPane.showMessageDialog(jframe, "IO Problem while sending your request.", "IO problem.", JOptionPane.ERROR_MESSAGE);         
             ex.printStackTrace();
+            this.windowManager.showConnectWindow();
+            pingTimer.cancel();
+            pingTimer.purge();
         } finally{
             try {
                 pingTimer.cancel();
@@ -123,6 +135,9 @@ public class Client implements Runnable{
                 s.close();
             } catch (IOException ex) {
                 System.err.println("E: Socket close failed, sucker!");
+                this.windowManager.showConnectWindow();
+                pingTimer.cancel();
+                pingTimer.purge();
             }
         }
     }
