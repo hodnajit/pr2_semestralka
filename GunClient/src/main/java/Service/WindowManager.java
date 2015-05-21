@@ -19,11 +19,26 @@ import comm.JiraClient;
  */
 public class WindowManager {
 
-    ConnectDialogue cd;
-    LoginDialogue ld;
-    MainWindow mw;
-    JiraClient jc;
-    Client c;
+    /**
+     * Instance of connectDialogue
+     */
+    private ConnectDialogue cd;
+    /**
+     * Instance of LoginDialogue
+     */
+    private LoginDialogue ld;
+    /**
+     * Instance of main Windo
+     */
+    private MainWindow mw;
+    /**
+     * instance of jira client
+     */
+    private JiraClient jc;
+    /**
+     * instance of client
+     */
+    private Client c;
 
     /**
      * Constructor of WindowManager. It create all windows (LoginDialogue,
@@ -35,6 +50,11 @@ public class WindowManager {
         ld.setVisible(true);
     }
 
+    /**
+     * loginDialogue dispose and show connect window
+     *
+     * @param jirC instance of jiraClient
+     */
     public void loginToJira(JiraClient jirC) {
         jc = jirC;
         ld.dispose();
@@ -42,12 +62,23 @@ public class WindowManager {
 
     }
 
+    /**
+     * show ConnectDialogue, if main window still running, dispose it
+     */
     public void showConnectWindow() {
-        if(mw != null)mw.dispose();
+        if (mw != null) {
+            mw.dispose();
+        }
         cd = new ConnectDialogue(this);
         cd.setVisible(true);
     }
 
+    /**
+     * Try to connect to server on rpi
+     *
+     * @param host ip adress of rpi
+     * @param port port of rpi
+     */
     public void connectToClient(String host, int port) {
         this.c = new Client(host, port, this);
         Thread t = new Thread(c);

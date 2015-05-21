@@ -66,7 +66,7 @@ public class MainWindow extends JFrame implements KeyListener {
      * pressing exit button you switch app off. By pressing save button you save
      * your profile. By pressing refresh button you get new catridges, you have
      * some. (load gun) By pressing keys ASDW you can control the gun A(move
-     * left), S(move down), W(move up), D(move right)
+     * left), S(move down), W(move up), D(move right), space(shoot)
      *
      */
     private void initComponents() {
@@ -95,7 +95,11 @@ public class MainWindow extends JFrame implements KeyListener {
         shoot.addKeyListener(this);
 
         save.addActionListener(new ActionListener() {
-
+            /**
+             * Save profile after save pressed
+             *
+             * @param e event of save
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 jiraClient.saveProfile();
@@ -103,6 +107,11 @@ public class MainWindow extends JFrame implements KeyListener {
 
         });
         save.addKeyListener(this);
+        /**
+         * System exit after click on button exit
+         *
+         * @param e button event
+         */
         exit.addActionListener(new ActionListener() {
 
             @Override
@@ -113,7 +122,11 @@ public class MainWindow extends JFrame implements KeyListener {
         });
         exit.addKeyListener(this);
         refresh.addActionListener(new ActionListener() {
-
+            /**
+             * refresh profile - load new done tasks
+             *
+             * @param e
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 startTask();
@@ -124,11 +137,23 @@ public class MainWindow extends JFrame implements KeyListener {
         this.addKeyListener(this);
     }
 
+    /**
+     * do nothing
+     *
+     * @param e
+     */
     @Override
     public void keyTyped(KeyEvent e) {
         //nothing to do
     }
 
+    /**
+     * if key Esc is pressed = close app if A is pressed move gun left if S is
+     * pressed move gun down if W is pressed move gun up if D is pressed move
+     * gun right
+     *
+     * @param e event of keyBoard
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
@@ -148,27 +173,41 @@ public class MainWindow extends JFrame implements KeyListener {
             if ("0".equals(cartridges.getText())) {
                 JOptionPane.showMessageDialog(this, "You don't have any bullets left.", "Not enought bullets", JOptionPane.WARNING_MESSAGE);
             } else {
-                client.sendMessage(new Message(Message.Command.SHOOT));
-                jiraClient.shoot();
-                cartridges.setText(Integer.toString(jiraClient.getCartridges()));
+                shoot();
             }
+        } else if (key == KeyEvent.VK_ESCAPE) {
+            System.exit(0);
         }
     }
 
+    /**
+     * do nothing
+     *
+     * @param e
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         //nothing to do
     }
 
+    /**
+     * Class SwingWorker with doing task - load new queue of tasks
+     */
     class Task extends SwingWorker<Void, Void> {
 
         private MainWindow mW;
 
+        /**
+         * Constructor of task
+         *
+         * @param mW instance of this window
+         */
         public Task(MainWindow mW) {
             this.mW = mW;
         }
         /*
          * Main task. Executed in background thread.
+         * Call updateIssueQueue in jiraClient
          */
 
         @Override
@@ -179,6 +218,7 @@ public class MainWindow extends JFrame implements KeyListener {
 
         /*
          * Executed in event dispatching thread
+         * When the task is done, button refres is enabled, progressBar removed, refres cartridges and repain Frame
          */
         @Override
         public void done() {
@@ -191,6 +231,9 @@ public class MainWindow extends JFrame implements KeyListener {
         }
     }
 
+    /**
+     * Add Action Listener for show message warning
+     */
     class acLisShoot implements ActionListener {
 
         JFrame mW;
@@ -199,36 +242,41 @@ public class MainWindow extends JFrame implements KeyListener {
             this.mW = mW;
         }
 
+        /**
+         * When you dont have any bullets left, show warning message.
+         *
+         * @param e
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if ("0".equals(cartridges.getText())) {
-                JOptionPane.showMessageDialog(mW, "You don't have any bullets left.","Not enough bullets.",JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(mW, "You don't have any bullets left.", "Not enough bullets.", JOptionPane.WARNING_MESSAGE);
             } else {
-                client.sendMessage(new Message(Message.Command.SHOOT));
-                jiraClient.shoot();
-                cartridges.setText(Integer.toString(jiraClient.getCartridges()));
+                shoot();
             }
         }
 
-    }/*
-    private JPanel getPanel() {
-        JPanel panel = new JPanel();
-        JLabel label = new JLabel("Fuck everything!");
-        ImageIcon image = null;
+    }
+
+    /**
+     * Shoot with gun.
+     */
+    private void shoot() {
+        client.sendMessage(new Message(Message.Command.SHOOT));
+        jiraClient.shoot();
+        cartridges.setText(Integer.toString(jiraClient.getCartridges()));
+        shoot.setEnabled(false);
         try {
-            image = new ImageIcon(ImageIO.read(getClass().getClassLoader().getResource("fuck.gif")));
-        } catch (MalformedURLException mue) {
-            mue.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+            Thread.sleep(2000);
+            shoot.setEnabled(true);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
+    }
 
-        label.setIcon(image);
-        panel.add(label);
-
-        return panel;
-    }*/
-
+    /**
+     * Start doing task - thread runs Add progressBar, repaint frame
+     */
     private void startTask() {
         getContentPane().add(progressBar);
         refresh.setEnabled(false);

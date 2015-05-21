@@ -49,7 +49,15 @@ public class LoginDialogue extends JFrame implements KeyListener {
      * Strings pass (password) and user (username) to create JiraClient
      */
     private String pass, user;
+    /**
+     * JiraClient
+     */
     private JiraClient jC;
+    /**
+     * Booleans to see if user clicked to textfields password and username
+     */
+    private boolean passwordClicked = false;
+    private boolean usernameClicked = false;
 
     /**
      * Constructor of LoginDialogue window, needs windowManager to manage
@@ -57,9 +65,6 @@ public class LoginDialogue extends JFrame implements KeyListener {
      *
      * @param w windowManager that manages windows in app
      */
-    private boolean passwordClicked = false;
-    private boolean usernameClicked = false;
-
     public LoginDialogue(WindowManager w) {
         this.windowManager = w;
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -82,6 +87,12 @@ public class LoginDialogue extends JFrame implements KeyListener {
         password.addKeyListener(this);
         password.addFocusListener(new FocusListener() {
 
+            /**
+             * Modify FocusListener - after clicked on TextField,
+             * passwordClicked = true
+             *
+             * @param e event of TextField password
+             */
             @Override
             public void focusGained(FocusEvent e) {
                 if (!passwordClicked) {
@@ -93,6 +104,12 @@ public class LoginDialogue extends JFrame implements KeyListener {
 
             }
 
+            /**
+             * After focus Lost - if it is still empty, set password text on
+             * "password" and passwordClicked = false;
+             *
+             * @param e event of textfield
+             */
             @Override
             public void focusLost(FocusEvent e) {
                 if (password.getPassword().length == 0) {
@@ -104,7 +121,12 @@ public class LoginDialogue extends JFrame implements KeyListener {
         });
         username.addKeyListener(this);
         username.addFocusListener(new FocusListener() {
-
+            /**
+             * Modify FocusListener - after clicked on TextField,
+             * usernameClicked = true
+             *
+             * @param e event of TextField username
+             */
             @Override
             public void focusGained(FocusEvent e) {
                 if (!usernameClicked) {
@@ -116,6 +138,12 @@ public class LoginDialogue extends JFrame implements KeyListener {
 
             }
 
+            /**
+             * After focus Lost - if it is still empty, set username text on
+             * "username" and usernameClicked = false;
+             *
+             * @param e event of textfield
+             */
             @Override
             public void focusLost(FocusEvent e) {
                 if ("".equals(username.getText())) {
@@ -127,7 +155,11 @@ public class LoginDialogue extends JFrame implements KeyListener {
         });
         exit.addKeyListener(this);
         exit.addActionListener(new ActionListener() {
-
+            /**
+             * System exit after click on button exit
+             *
+             * @param e button event
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
@@ -136,7 +168,11 @@ public class LoginDialogue extends JFrame implements KeyListener {
         });
         login.addKeyListener(this);
         login.addActionListener(new ActionListener() {
-
+            /**
+             * Try to connect to atlassian server - call login
+             *
+             * @param e event of connect button
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 char[] tmp = password.getPassword();
@@ -149,6 +185,12 @@ public class LoginDialogue extends JFrame implements KeyListener {
         getContentPane().add(exit);
     }
 
+    /**
+     * if key Esc is pressed = close app if enter is pressed = try to connect to
+     * server
+     *
+     * @param e event of keyBoard
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
@@ -159,16 +201,30 @@ public class LoginDialogue extends JFrame implements KeyListener {
         }
     }
 
+    /**
+     * do nothing
+     *
+     * @param e
+     */
     @Override
     public void keyTyped(KeyEvent e) {
         //do nothing
     }
 
+    /**
+     * do nothing
+     *
+     * @param e
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         //do nothing
     }
 
+    /**
+     * Try to log to atlassian server and send basic request there. If it is
+     * good, new window comes, if not you can try to log again
+     */
     private void login() {
         char[] tmp = password.getPassword();
         int len = tmp.length;

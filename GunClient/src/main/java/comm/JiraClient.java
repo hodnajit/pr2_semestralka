@@ -93,8 +93,6 @@ public class JiraClient {
      */
     private int cartridges = 0;
 
-    Authentication authentication;
-
     /**
      * Constructor for create JiraClient, it sets username and password of user,
      * create jiraClient, create issueQueue and save here the JSON query, that
@@ -162,10 +160,10 @@ public class JiraClient {
         }
     }
 
-/**
- * Methods decreace cartridge, after is has been shot
- */
-public void shoot() {
+    /**
+     * Methods decreace cartridge, after is has been shot
+     */
+    public void shoot() {
         if (cartridges <= 0) {
             //DO NOTHING
         } else {
@@ -197,11 +195,7 @@ public void shoot() {
             out.write(cartridges);
             out.close();
             fileOut.close();
-            Logger
-
-.getLogger(JiraClient.class  
-
-.getName()).log(Level.FINE, "Saving profile was done.");
+            Logger.getLogger(JiraClient.class.getName()).log(Level.FINE, "Saving profile was done.");
 
         } catch (IOException i) {
             i.printStackTrace();
@@ -227,6 +221,11 @@ public void shoot() {
         return this.issueQueue.size();
     }
 
+    /**
+     * Is connecting to atlassian server good?
+     *
+     * @return true if it's false if it's not
+     */
     public boolean didAnythingReturn() {
         try {
             //BasicProject bc = restClient.getProjectClient().getProject("TPR").claim();
@@ -260,9 +259,11 @@ public void shoot() {
      */
     public void clearQueue() {
         issueQueue.clear();
-    }    
+    }
+
     /**
      * Getter for restClient
+     *
      * @return restClient
      */
     public JiraRestClient getRestClient() {

@@ -7,40 +7,40 @@ package Tests;
 
 import Service.WindowManager;
 import comm.Client;
-import java.net.UnknownHostException;
 import model.Message;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
  * Class for testing Client to connect to device.
+ *
  * @author Jituška zub
  */
 public class ClientTest {
+
     Client c;
     /**
-     * Attention, that will stop working, when device will be elsewhere! It is test for running on test IP Adress at home
-     * Host - ip of device
-     */     
+     * Attention, that will stop working, when device will be elsewhere! It is
+     * test for running on test IP Adress at home Host - ip of device
+     */
     String host = "10.0.0.3";
     /**
-     Attention, that will stop working, when device will be elsewhere! It is test for running on test port at home
-     * Port - port of device
+     * Attention, that will stop working, when device will be elsewhere! It is
+     * test for running on test port at home Port - port of device
      */
     int port = 1710;
     private WindowManager wM;
-    
-    public ClientTest() {        
+
+    public ClientTest() {
         c = new Client(host, port, wM);
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
@@ -51,10 +51,10 @@ public class ClientTest {
     // @Test
     // public void hello() {}
     @Test
-    public void testMessageQueue(){
+    public void testMessageQueue() {
         c = new Client(host, port, wM);
         assertTrue(c.getQueue().isEmpty());
         c.sendMessage(new Message(Message.Type.PING, "PU = Ping you."));
-        assertFalse(c.getQueue().isEmpty());       
-    }   
+        assertFalse(c.getQueue().isEmpty());
+    }
 }

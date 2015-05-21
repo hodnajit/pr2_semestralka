@@ -12,10 +12,12 @@ import java.io.Serializable;
  * @author Jituška zub
  */
 public class Message implements Serializable {
+
     /**
      * Type of message that can server get and send
      */
     public enum Type {
+
         /**
          * Handshake when communication is established
          */
@@ -41,10 +43,12 @@ public class Message implements Serializable {
          */
         PING
     }
+
     /**
      * Type of command that can server get
      */
     public enum Command {
+
         /**
          * Up to move up with gun
          */
@@ -90,6 +94,7 @@ public class Message implements Serializable {
      * Value of the command
      */
     public int cmdValue;
+
     /**
      * Constructor to create message of enter type and string
      *
@@ -100,6 +105,7 @@ public class Message implements Serializable {
         this.type = type;
         this.message = message;
     }
+
     /**
      * Constructor to create message as the entered command
      *
@@ -109,6 +115,7 @@ public class Message implements Serializable {
         this.type = Type.COMMAND;
         this.command = cmd;
     }
+
     /**
      * Constructor to create message as the entered command and value of command
      *

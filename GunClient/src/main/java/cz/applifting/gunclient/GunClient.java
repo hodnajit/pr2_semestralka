@@ -6,15 +6,17 @@
 package cz.applifting.gunclient;
 
 import Service.WindowManager;
+
 /**
  * Runs gunClient
+ *
  * @author Jituška Zub
  */
-public class GunClient {    
-    
+public class GunClient {
+
     public static void main(String[] args) {
         System.out.println("Runs.");
-        WindowManager windowManager = new WindowManager();        
+        WindowManager windowManager = new WindowManager();
     }
-    
+
 }

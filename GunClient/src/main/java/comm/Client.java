@@ -147,14 +147,28 @@ public class Client implements Runnable {
         }
     }
 
+    /**
+     *
+     * @return if connecting to server was succesfull or not
+     */
     public boolean succesfullyStarted() {
         return this.startedUp;
     }
 
+    /**
+     * Add message to queue, ready to send
+     *
+     * @param messageToSend new request from client to server via Message
+     */
     public void sendMessage(Message messageToSend) {
         this.queue.add(messageToSend);
     }
-    
+
+    /**
+     * Getter for queue
+     *
+     * @return queue of messages
+     */
     public Queue<Message> getQueue() {
         return queue;
     }

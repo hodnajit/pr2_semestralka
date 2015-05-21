@@ -24,7 +24,7 @@ import javax.swing.*;
  *
  * @author Jituška zub
  */
-public class ConnectDialogue extends JFrame implements KeyListener{
+public class ConnectDialogue extends JFrame implements KeyListener {
 
     /**
      * Buttons exit and connect
@@ -41,8 +41,15 @@ public class ConnectDialogue extends JFrame implements KeyListener{
     /**
      * IP address of server, string for creating client
      */
+    /**
+     * If is clicked on TextField IP
+     */
     private boolean ipClicked = false;
+    /**
+     * If is clicked on TextField PORT
+     */
     private boolean portClicked = false;
+
     /**
      * Constructor of ConnectDialogue window, needs windowManager to manage
      * window, it call method initComponents() to init components in frame
@@ -59,58 +66,85 @@ public class ConnectDialogue extends JFrame implements KeyListener{
     }
 
     /**
-     * Init components, add action listeners to them, buttons exit and connect
-     * respond when buttons are pressed
+     * Init components, add action listeners to them, buttons exit and connect,
+     * key listeners to frame and all components respond when buttons are
+     * pressed
      */
     private void initComponents() {
         ip = new JTextField("IP adress", 20);
         connect = new JButton("connect");
-        port = new JTextField("Port",5);        
+        port = new JTextField("Port", 5);
         exit = new JButton("exit");
-        
-        ip.addKeyListener(this);
-        ip.addFocusListener(new FocusListener(){
 
+        ip.addKeyListener(this);
+        ip.addFocusListener(new FocusListener() {
+            /**
+             * Modify FocusListener - after clicked on TextField, ipClicked =
+             * true
+             *
+             * @param e event of TextField ip
+             */
             @Override
             public void focusGained(FocusEvent e) {
-                if(!ipClicked){
+                if (!ipClicked) {
                     ip.setText("");
                     ipClicked = true;
                 }
             }
 
+            /**
+             * After focus Lost - if it is still empty, set ip text on "IP
+             * adress" and ipClicked = false;
+             *
+             * @param e event of textfield
+             */
             @Override
             public void focusLost(FocusEvent e) {
-               if("".equals(ip.getText())){
-                   ip.setText("IP adress");
-                   ipClicked = false;
-               }
+                if ("".equals(ip.getText())) {
+                    ip.setText("IP adress");
+                    ipClicked = false;
+                }
             }
-            
+
         });
         port.addKeyListener(this);
-        port.addFocusListener(new FocusListener(){
-
+        port.addFocusListener(new FocusListener() {
+            /**
+             * Modify FocusListener - after clicked on TextField, portClicked =
+             * true
+             *
+             * @param e event of TextField port
+             */
             @Override
             public void focusGained(FocusEvent e) {
-                if(!portClicked){
+                if (!portClicked) {
                     port.setText("");
                     portClicked = true;
                 }
             }
 
+            /**
+             * After focus Lost - if it is still empty, set ip text on "port"
+             * and portClicked = false;
+             *
+             * @param e event of textfield
+             */
             @Override
             public void focusLost(FocusEvent e) {
-                if("".equals(port.getText())){
-                   port.setText("Port");
-                   portClicked = false;
-               }
+                if ("".equals(port.getText())) {
+                    port.setText("Port");
+                    portClicked = false;
+                }
             }
-            
+
         });
         exit.addKeyListener(this);
         exit.addActionListener(new ActionListener() {
-
+            /**
+             * System exit after click on button exit
+             *
+             * @param e button event
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
@@ -119,7 +153,11 @@ public class ConnectDialogue extends JFrame implements KeyListener{
         });
         connect.addKeyListener(this);
         connect.addActionListener(new ActionListener() {
-
+            /**
+             * Try to connect to server - call connectToClient in windowManager
+             *
+             * @param e event of connect button
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 windowManager.connectToClient(ip.getText(), Integer.parseInt(port.getText()));
@@ -135,22 +173,38 @@ public class ConnectDialogue extends JFrame implements KeyListener{
 
     }
 
+    /**
+     * Do nothing
+     *
+     * @param e
+     */
     @Override
     public void keyTyped(KeyEvent e) {
         //do nothing
     }
 
+    /**
+     * if key Esc is pressed = close app if enter is pressed = try to connect to
+     * server
+     *
+     * @param e event of keyBoard
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_ESCAPE) {
             System.exit(0);
-        }else if(key == KeyEvent.VK_ENTER){
+        } else if (key == KeyEvent.VK_ENTER) {
             windowManager.connectToClient(ip.getText(), Integer.parseInt(port.getText()));
             dispose();
         }
     }
 
+    /**
+     * do nothing
+     *
+     * @param e
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         //do nothing
