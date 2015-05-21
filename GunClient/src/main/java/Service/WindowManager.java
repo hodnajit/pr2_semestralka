@@ -81,10 +81,10 @@ public class WindowManager {
      */
     public void connectToClient(String host, int port) {
         this.c = new Client(host, port, this);
+        cd.dispose();
         Thread t = new Thread(c);
         t.setDaemon(true);
-        t.start();
-        cd.dispose();
+        t.start();        
         mw = new MainWindow(this, jc, c);
         mw.setVisible(true);
     }
