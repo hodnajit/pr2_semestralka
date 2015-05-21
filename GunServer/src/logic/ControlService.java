@@ -50,7 +50,7 @@ public class ControlService {
      */
     private final int minAngleHor = -1500;
     /**
-     * Angle to turn in command case UP, DOWN, LEFT, RIGHT, initialized on default 200 angle (good angle to move servos anywhere)
+     * Angle to turn in command case UP, DOWN, LEFT, RIGHT, it initialized an one twentieth from range of servo (also, it is not)
      */
     private int stepAngleVer = 200;
     private int stepAngleHor = 200;
