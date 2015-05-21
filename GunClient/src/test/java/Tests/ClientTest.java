@@ -7,8 +7,13 @@ package Tests;
 
 import Service.WindowManager;
 import comm.Client;
+import java.net.UnknownHostException;
+import model.Message;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * Class for testing Client to connect to device.
@@ -45,4 +50,11 @@ public class ClientTest {
     //
     // @Test
     // public void hello() {}
+    @Test
+    public void testMessageQueue(){
+        c = new Client(host, port, wM);
+        assertTrue(c.getQueue().isEmpty());
+        c.sendMessage(new Message(Message.Type.PING, "PU = Ping you."));
+        assertFalse(c.getQueue().isEmpty());       
+    }   
 }
