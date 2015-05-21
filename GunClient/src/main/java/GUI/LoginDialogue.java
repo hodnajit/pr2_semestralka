@@ -27,7 +27,7 @@ import org.codehaus.jettison.json.JSONException;
  *
  * @author Jituška zub
  */
-public class LoginDialogue extends JFrame implements KeyListener{
+public class LoginDialogue extends JFrame implements KeyListener {
 
     /**
      * PasswordField to add password of user
@@ -49,6 +49,7 @@ public class LoginDialogue extends JFrame implements KeyListener{
      * Strings pass (password) and user (username) to create JiraClient
      */
     private String pass, user;
+    private JiraClient jC;
 
     /**
      * Constructor of LoginDialogue window, needs windowManager to manage
@@ -58,6 +59,7 @@ public class LoginDialogue extends JFrame implements KeyListener{
      */
     private boolean passwordClicked = false;
     private boolean usernameClicked = false;
+
     public LoginDialogue(WindowManager w) {
         this.windowManager = w;
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -76,53 +78,52 @@ public class LoginDialogue extends JFrame implements KeyListener{
         login = new JButton("log in");
         exit = new JButton("exit");
         setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
-        
+
         password.addKeyListener(this);
-        password.addFocusListener(new FocusListener(){
+        password.addFocusListener(new FocusListener() {
 
             @Override
             public void focusGained(FocusEvent e) {
-                if (!passwordClicked){
+                if (!passwordClicked) {
                     password.setText("");
                     passwordClicked = true;
-                }else{
+                } else {
                     //DO NOTHING...
                 }
-                
+
             }
 
             @Override
             public void focusLost(FocusEvent e) {
-                if (password.getPassword().length==0){
+                if (password.getPassword().length == 0) {
                     password.setText("password");
                     passwordClicked = false;
                 }
             }
-            
+
         });
         username.addKeyListener(this);
-        username.addFocusListener(new FocusListener(){
+        username.addFocusListener(new FocusListener() {
 
             @Override
             public void focusGained(FocusEvent e) {
-                if (!usernameClicked){
+                if (!usernameClicked) {
                     username.setText("");
                     usernameClicked = true;
-                }else{
+                } else {
                     //DO NOTHING...
                 }
-                
+
             }
 
             @Override
             public void focusLost(FocusEvent e) {
-                if ("".equals(username.getText())){
+                if ("".equals(username.getText())) {
                     username.setText("username");
                     usernameClicked = false;
                 }
             }
 
-            
         });
         exit.addKeyListener(this);
         exit.addActionListener(new ActionListener() {
@@ -139,27 +140,7 @@ public class LoginDialogue extends JFrame implements KeyListener{
             @Override
             public void actionPerformed(ActionEvent e) {
                 char[] tmp = password.getPassword();
-                int len = tmp.length;
-                for (int i = 0; i < len; i++) {
-                    pass += tmp[i];
-                }
-                user = username.getText();
-                /*pass = "iddqdiddqd"; //I should not push this to repo, but I did...
-                user = "FilipK";*/
-                try {
-                    JiraClient jC = new JiraClient(user, pass);
-                    if(!jC.didAnythingReturn()){
-                        JOptionPane.showMessageDialog(null, "Wrong username or password, try again.", "Wrong authentification.", JOptionPane.WARNING_MESSAGE);
-                    }else{
-                        windowManager.loginToJira(jC);
-                    }                    
-                } catch (URISyntaxException ex) {
-                    Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "URISyntax error with connecting to jira.", ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "Error in loading documents.", ex);
-                } catch (JSONException ex) {
-                    Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "Bad identification.", ex);
-                }
+                login();
             }
         });
         getContentPane().add(username);
@@ -167,28 +148,14 @@ public class LoginDialogue extends JFrame implements KeyListener{
         getContentPane().add(login);
         getContentPane().add(exit);
     }
-    
+
     @Override
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         if (key == KeyEvent.VK_ESCAPE) {
             System.exit(0);
-        }else if(key == KeyEvent.VK_ENTER){
-            char[] tmp = password.getPassword();
-                int len = tmp.length;
-                for (int i = 0; i < len; i++) {
-                    pass += tmp[i];
-                }
-                user = username.getText();
-                try {
-                    windowManager.loginToJira(new JiraClient(user, pass));
-                } catch (URISyntaxException ex) {
-                    Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "URISyntax error with connecting to jira.", ex);
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "Error in loading documents.", ex);
-                } catch (JSONException ex) {
-                    Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "Bad identification.", ex);
-                }
+        } else if (key == KeyEvent.VK_ENTER) {
+            login();
         }
     }
 
@@ -200,6 +167,34 @@ public class LoginDialogue extends JFrame implements KeyListener{
     @Override
     public void keyReleased(KeyEvent e) {
         //do nothing
+    }
+
+    private void login() {
+        char[] tmp = password.getPassword();
+        int len = tmp.length;
+        pass = "";
+        for (int i = 0; i < len; i++) {
+            pass += tmp[i];
+        }
+        user = username.getText();
+        /*pass = "iddqdiddqd"; //I should not push this to repo, but I did...
+         user = "FilipK";*/
+        try {
+            JiraClient jC = new JiraClient(user, pass);
+            if (!jC.didAnythingReturn()) {
+                JOptionPane.showMessageDialog(null, "Wrong username or password, try again.", "Wrong authentification.", JOptionPane.WARNING_MESSAGE);
+            } else {
+                windowManager.loginToJira(jC);
+            }
+
+            windowManager.loginToJira(jC);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "URISyntax error with connecting to jira.", ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "Error in loading documents.", ex);
+        } catch (JSONException ex) {
+            Logger.getLogger(LoginDialogue.class.getName()).log(Level.SEVERE, "Bad identification.", ex);
+        }
     }
 
 }

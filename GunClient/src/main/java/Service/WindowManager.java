@@ -53,6 +53,7 @@ public class WindowManager {
         Thread t = new Thread(c);
         t.setDaemon(true);
         t.start();
+        cd.dispose();
         mw = new MainWindow(this, jc, c);
         mw.setVisible(true);
     }

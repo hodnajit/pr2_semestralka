@@ -23,7 +23,6 @@ import com.atlassian.jira.rest.client.domain.Authentication;
 import com.atlassian.jira.rest.client.domain.BasicIssue;
 import com.atlassian.jira.rest.client.domain.BasicProject;
 import com.atlassian.jira.rest.client.domain.SearchResult;
-import com.atlassian.jira.rest.client.domain.ServerInfo;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory;
 import com.atlassian.util.concurrent.Promise;
 import java.util.logging.Level;
@@ -82,6 +81,7 @@ public class JiraClient {
      * rest client
      */
     private final JiraRestClient restClient;
+
     private final NullProgressMonitor pm;
     /**
      * queue of done issues, here we save the JSON query
@@ -92,7 +92,7 @@ public class JiraClient {
      * Number of cartridges for shooting, it is inicialized on zero
      */
     private int cartridges = 0;
-    
+
     Authentication authentication;
 
     /**
@@ -110,7 +110,6 @@ public class JiraClient {
     public JiraClient(String userName, String password) throws URISyntaxException, ClassNotFoundException, JSONException {
         this.jiraUsername = userName;
         this.jiraPassword = password;
-
         factory = new AsynchronousJiraRestClientFactory();
         jiraServerUri = new URI(url);
         restClient = factory.createWithBasicHttpAuthentication(jiraServerUri, jiraUsername, jiraPassword);
@@ -147,16 +146,13 @@ public class JiraClient {
      * update date
      */
     public void doQueueOfDoneIssues() {
-        System.out.println("Fuck that!");
         issueQueue = new ArrayList<String>();
         //System.out.println("Jdu vypsat tasky:");
         for (BasicProject project : restClient.getProjectClient().getAllProjects().claim()) {
-            System.out.println("and that");
             String key = project.getKey();
             //System.out.println("Project: " + key);
             Promise<SearchResult> searchJqlPromise = restClient.getSearchClient().searchJql("(project = '" + key + "' AND status = " + statusOfIssues + " AND assignee = " + jiraUsername + ") ORDER BY updated");
             for (BasicIssue BIssue : searchJqlPromise.claim().getIssues()) {
-                System.out.println("everything!");
                 String isKey = BIssue.getKey();
                 //System.out.println("Issue: " + isKey);
                 Promise<Issue> issue = restClient.getIssueClient().getIssue(isKey);
@@ -164,13 +160,12 @@ public class JiraClient {
                 issueQueue.add(BIssue.getKey());
             }
         }
-
     }
 
-    /**
-     * Methods decreace cartridge, after is has been shot
-     */
-    public void shoot() {
+/**
+ * Methods decreace cartridge, after is has been shot
+ */
+public void shoot() {
         if (cartridges <= 0) {
             //DO NOTHING
         } else {
@@ -202,7 +197,11 @@ public class JiraClient {
             out.write(cartridges);
             out.close();
             fileOut.close();
-            Logger.getLogger(JiraClient.class.getName()).log(Level.FINE, "Saving profile was done.");
+            Logger
+
+.getLogger(JiraClient.class  
+
+.getName()).log(Level.FINE, "Saving profile was done.");
 
         } catch (IOException i) {
             i.printStackTrace();
@@ -227,18 +226,16 @@ public class JiraClient {
     private int sumProjectile() {
         return this.issueQueue.size();
     }
-    
-    public boolean didAnythingReturn(){
-        try{
+
+    public boolean didAnythingReturn() {
+        try {
             //BasicProject bc = restClient.getProjectClient().getProject("TPR").claim();
-            System.out.println("true");
             return true;
-        }catch(RestClientException rCE){
-            System.out.println("Serou na mě.");
+        } catch (RestClientException rCE) {
+            rCE.printStackTrace();
             return false;
         }
     }
-    
 
     /**
      * Getter to get number of cartridges
@@ -248,6 +245,7 @@ public class JiraClient {
     public int getCartridges() {
         return cartridges;
     }
+
     /**
      * Getter to get queue of tasks, almost NULL
      *
@@ -256,10 +254,18 @@ public class JiraClient {
     public List<String> getIssueQueue() {
         return issueQueue;
     }
+
     /**
      * Clear queue;
      */
-    public void clearQueue(){
+    public void clearQueue() {
         issueQueue.clear();
+    }    
+    /**
+     * Getter for restClient
+     * @return restClient
+     */
+    public JiraRestClient getRestClient() {
+        return restClient;
     }
 }
